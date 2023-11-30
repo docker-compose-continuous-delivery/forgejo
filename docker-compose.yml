@@ -2,24 +2,54 @@ version: "3.9"
 
 services:
 
-  hello-world:
-    image: "traefik/whoami"
-    container_name: "simple-service"
+  gitea:
+    image: gitea/gitea:1.19
+    container_name: gitea
     restart: unless-stopped
+    environment:
+      - USER_UID=1000
+      - USER_GID=1000
+      - GITEA__database__DB_TYPE=postgres
+      - GITEA__database__HOST=db_gitea:5432
+      - GITEA__database__NAME=gitea
+    env_file:
+      - .gitea.env
+    ports:
+      - "61183:61183"
     networks:
       - traefik
+    volumes:
+      - gitea_data:/data
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    depends_on:
+      db_gitea:
+        condition: service_healthy
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.simple-service.rule=Host(`hello-world.${BASE_DOMAIN:-ozeliurs.com}`)"
-      - "traefik.http.routers.simple-service.entrypoints=websecure"
-      - "traefik.http.routers.simple-service.tls=true"
-      - "traefik.http.routers.simple-service.tls.certresolver=cloudflare"
-      - "traefik.http.services.simple-service.loadbalancer.server.port=80"
+      - "traefik.http.routers.gitea.rule=Host(`git.${BASE_DOMAIN:-ozeliurs.com}`)"
+      - "traefik.http.routers.gitea.entrypoints=websecure"
+      - "traefik.http.services.gitea.loadbalancer.server.port=3000"
+      - "traefik.http.routers.gitea.tls.certresolver=cloudflare"
     healthcheck:
-      test: [ "CMD", "wget", "-q", "--spider", "http://localhost:80" ]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+      test: ["CMD", "curl", "-f", "http://localhost:3000/"]
+
+  gitea_postgres:
+    image: postgres:14
+    container_name: gitea_postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=gitea
+    env_file:
+      - .gitea.env
+    volumes:
+      - gitea_db:/var/lib/postgresql/data
+    labels:
+      - "traefik.enable=false"
+    networks:
+      - traefik
+    healthcheck:
+      test: [ "CMD", "pg_isready" ]
 
 
 networks:
