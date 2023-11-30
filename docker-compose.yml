@@ -55,3 +55,7 @@ services:
 networks:
   traefik:
     external: true
+
+volumes:
+  gitea_data:
+  gitea_db:
