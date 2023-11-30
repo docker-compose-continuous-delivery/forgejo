@@ -10,7 +10,7 @@ services:
       - USER_UID=1000
       - USER_GID=1000
       - GITEA__database__DB_TYPE=postgres
-      - GITEA__database__HOST=db_gitea:5432
+      - GITEA__database__HOST=gitea_postgres:5432
       - GITEA__database__NAME=gitea
     env_file:
       - .gitea.env
@@ -23,7 +23,7 @@ services:
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
     depends_on:
-      db_gitea:
+      gitea_postgres:
         condition: service_healthy
     labels:
       - "traefik.enable=true"
