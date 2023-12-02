@@ -31,6 +31,8 @@ services:
       - "traefik.http.routers.gitea.entrypoints=websecure"
       - "traefik.http.services.gitea.loadbalancer.server.port=3000"
       - "traefik.http.routers.gitea.tls.certresolver=cloudflare"
+
+      - "com.centurylinklabs.watchtower.enable=true"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3000/"]
 
@@ -46,6 +48,8 @@ services:
       - gitea_db:/var/lib/postgresql/data
     labels:
       - "traefik.enable=false"
+
+      - "com.centurylinklabs.watchtower.enable=true"
     networks:
       - traefik
     healthcheck:
