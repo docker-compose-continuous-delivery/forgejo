@@ -34,7 +34,7 @@ services:
 
       - "com.centurylinklabs.watchtower.enable=true"
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000/"]
+      test: [ "CMD", "curl", "-f", "http://localhost:3000/" ]
 
   gitea_postgres:
     image: postgres:14
@@ -65,10 +65,16 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
       - CONFIG_FILE=/config.yaml
-      - GITEA_INSTANCE_URL=https://git.${BASE_DOMAIN:-ozeliurs.com}
+      - GITEA_INSTANCE_URL=http://gitea:3000
       - GITEA_RUNNER_NAME=embedded-runner
     env_file:
       - .runner.env
+    networks:
+      - traefik
+    labels:
+      - "traefik.enable=false"
+
+      - "com.centurylinklabs.watchtower.enable=true"
 
 
 networks:
