@@ -6,3 +6,4 @@
 
 # git-secret-encrypted
 .gitea.env
+.runner.env
