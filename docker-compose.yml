@@ -65,7 +65,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
       - CONFIG_FILE=/config.yaml
-      - GITEA_INSTANCE_URL=http://gitea:3000
+      - GITEA_INSTANCE_URL=https://git.ozeliurs.com
       - GITEA_RUNNER_NAME=embedded-runner
     env_file:
       - .runner.env
