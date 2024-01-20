@@ -65,7 +65,6 @@ services:
     environment:
       - CONFIG_FILE=/config.yaml
       - GITEA_INSTANCE_URL=https://git.ozeliurs.com
-      - GITEA_RUNNER_NAME=embedded-runner
     env_file:
       - .runner.env
     networks:
