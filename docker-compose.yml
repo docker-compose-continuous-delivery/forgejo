@@ -57,7 +57,6 @@ services:
 
   gitea_worker:
     image: gitea/act_runner:latest
-    container_name: gitea_worker
     restart: unless-stopped
     volumes:
       - ./runner/config.yaml:/config.yaml
