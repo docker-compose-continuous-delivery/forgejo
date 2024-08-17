@@ -11,8 +11,6 @@ services:
       - USER_GID=1000
       - SSH_LISTEN_PORT=2222
       - SSH_PORT=2222
-    env_file:
-      - .forgejo.env
     ports:
       - "2222:2222"
     networks:
