@@ -2,84 +2,39 @@ version: "3.9"
 
 services:
 
-  gitea:
-    image: gitea/gitea:1.21
-    container_name: gitea
+  forgejo:
+    image: forgejo/forgejo:1.21
+    container_name: forgejo
     restart: unless-stopped
     environment:
       - USER_UID=1000
       - USER_GID=1000
-      - GITEA__database__DB_TYPE=postgres
-      - GITEA__database__HOST=gitea_postgres:5432
-      - GITEA__database__NAME=gitea
+      - SSH_LISTEN_PORT=2222
+      - SSH_PORT=2222
     env_file:
-      - .gitea.env
+      - .forgejo.env
     ports:
-      - "61183:61183"
+      - "2222:2222"
     networks:
       - traefik
     volumes:
-      - gitea_data:/data
+      - forgejo_data:/data
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
-    depends_on:
-      gitea_postgres:
-        condition: service_healthy
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.gitea.rule=Host(`git.${BASE_DOMAIN:-ozeliurs.com}`)"
-      - "traefik.http.routers.gitea.entrypoints=websecure"
-      - "traefik.http.services.gitea.loadbalancer.server.port=3000"
-      - "traefik.http.routers.gitea.tls.certresolver=cloudflare"
+      - "traefik.http.routers.forgejo.rule=Host(`git.${BASE_DOMAIN:-ozeliurs.com}`)"
+      - "traefik.http.routers.forgejo.entrypoints=websecure"
+      - "traefik.http.services.forgejo.loadbalancer.server.port=3000"
+      - "traefik.http.routers.forgejo.tls.certresolver=cloudflare"
 
       - "com.centurylinklabs.watchtower.enable=true"
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:3000/" ]
-
-  gitea_postgres:
-    image: postgres:14
-    container_name: gitea_postgres
-    restart: unless-stopped
-    environment:
-      - POSTGRES_DB=gitea
-    env_file:
-      - .gitea.env
-    volumes:
-      - gitea_db:/var/lib/postgresql/data
-    labels:
-      - "traefik.enable=false"
-
-      - "com.centurylinklabs.watchtower.enable=true"
-    networks:
-      - traefik
-    healthcheck:
-      test: [ "CMD", "pg_isready" ]
-
-  gitea_worker:
-    image: gitea/act_runner:latest
-    restart: unless-stopped
-    volumes:
-      - ./runner/config.yaml:/config.yaml
-      - ./runner/data:/data
-      - /var/run/docker.sock:/var/run/docker.sock
-    environment:
-      - CONFIG_FILE=/config.yaml
-      - GITEA_INSTANCE_URL=https://git.ozeliurs.com
-      - GITEA_RUNNER_NAME=embedded-runner
-    env_file:
-      - .runner.env
-    networks:
-      - traefik
-    labels:
-      - "traefik.enable=false"
-
-      - "com.centurylinklabs.watchtower.enable=true"
-
 
 networks:
   traefik:
     external: true
 
 volumes:
-  gitea_data:
-  gitea_db:
+  forgejo_data:
